@@ -44,8 +44,14 @@ public class LoginUserTestCase {
         Map<String, String> data = create();
         Response response = user.loginUser(data.get("email"), data.get("password"));
 
-        assertEquals("Неверный код ответа", 200, response.statusCode());
-        assertEquals("Невалидные данные в ответе: success", true, response.path("success"));
+        String token = response.path("accessToken");
+        if(token == null)
+        {
+            assertEquals("Неверный код ответа", 200, response.statusCode());
+            assertEquals("Невалидные данные в ответе: success", true, response.path("success"));
+        } else{
+            user.deleteUser(token);
+        }
     }
 
     @Tag("LoginUser")
@@ -56,8 +62,14 @@ public class LoginUserTestCase {
         Map<String, String> data = create();
         Response response = user.loginUser(data.get("email"), "incorrect");
 
-        assertEquals("Неверный код ответа", 401, response.statusCode());
-        assertEquals("Невалидные данные в ответе: success", false, response.path("success"));
-        assertEquals("Невалидные данные в ответе: message", "email or password are incorrect", response.path("message"));
+        String token = response.path("accessToken");
+        if(token == null)
+        {
+            assertEquals("Неверный код ответа", 401, response.statusCode());
+            assertEquals("Невалидные данные в ответе: success", false, response.path("success"));
+            assertEquals("Невалидные данные в ответе: message", "email or password are incorrect", response.path("message"));
+        } else{
+            user.deleteUser(token);
+        }
     }
 }

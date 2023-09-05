@@ -2,6 +2,7 @@ package services;
 
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
+import io.restassured.response.ValidatableResponse;
 import model.Specification;
 import org.json.JSONObject;
 
@@ -56,6 +57,17 @@ public class User extends Specification {
                 .body(requestBody)
                 .when()
                 .patch(USER_PATH + "user/");
+        return response;
+    }
+
+    @Step ("Удалить пользователя.")
+    public ValidatableResponse deleteUser(String token) {
+        ValidatableResponse response = given()
+                .header("Authorization", token)
+                .spec(getBaseSpec())
+                .delete(USER_PATH + "user/")
+                .then()
+                .statusCode(202);
         return response;
     }
 }

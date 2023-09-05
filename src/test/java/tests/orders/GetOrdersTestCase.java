@@ -20,6 +20,7 @@ public class GetOrdersTestCase {
     User user;
     Order order;
     Ingredients ingredients;
+    private String accessToken;
 
     private String createAndLoginUser(){
         String username = RandomStringUtils.randomAlphabetic(10);
@@ -32,7 +33,12 @@ public class GetOrdersTestCase {
     }
 
     @Before
-    public void setUp() {user = new User(); order = new Order(); ingredients = new Ingredients();}
+    public void setUp() {user = new User(); order = new Order(); ingredients = new Ingredients();
+        accessToken = createAndLoginUser();
+        Response responseIngredients = ingredients.getIngredients();
+        List<String> ingredients = responseIngredients.path("data._id");
+        order.createOrder(ingredients, accessToken);
+    }
 
     @Tag("GetOrders")
     @Test
@@ -49,6 +55,8 @@ public class GetOrdersTestCase {
         assertEquals("Неверный код ответа", 200, response.statusCode());
         assertEquals("Невалидные данные в ответе: success", true, response.path("success"));
         assertThat("Заказа не существует", response.path("orders"), notNullValue());
+
+        user.deleteUser(accessToken);
     }
 
     @Tag("GetOrders")
